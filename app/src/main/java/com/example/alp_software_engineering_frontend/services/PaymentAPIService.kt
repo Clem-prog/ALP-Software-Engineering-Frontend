@@ -17,14 +17,11 @@ interface PaymentAPIService {
     @GET("api/payments")
     fun getAllPayments (@Header("X-API-TOKEN") token: String): Call<GetAllPaymentsResponse>
 
-    @GET("api/payments/{id}")
-    fun getPaymentById (@Header("X-API-TOKEN") token: String, @Path("id") paymentId: Int): Call<GetPaymentResponse>
+    @GET("api/payments/latest/{roomid}")
+    fun getLatestPayment (@Header("X-API-TOKEN") token: String, @Path("roomid") roomId: Int): Call<GetPaymentResponse>
 
     @POST("api/payments")
     fun createPayment(@Header("X-API-TOKEN") token: String, @Body paymentModel: PaymentRequest): Call<GetPaymentResponse>
-
-    @PUT("api/payments/{id}")
-    fun updatePayment(@Header("X-API-TOKEN") token: String, @Path("id") paymentId: Int, @Body paymentModel: PaymentRequest): Call<GetPaymentResponse>
 
     @DELETE("api/payments/{id}")
     fun deletePayment(@Header("X-API-TOKEN") token: String, @Path("id") paymentId: Int): Call<GeneralResponseModel>

@@ -17,15 +17,3 @@ data class UserModel (
     val token: String?
 )
 
-data class UserRequest (
-    val name: String,
-    val email: String,
-    val password: String,
-    val isAdmin: Boolean,
-    val token: String?
-)
-
-data class LogInResponse(
-    val data: UserModel
-)
-
