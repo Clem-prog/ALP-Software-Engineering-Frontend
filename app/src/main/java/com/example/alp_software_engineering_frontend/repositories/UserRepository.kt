@@ -22,6 +22,7 @@ interface UserRepository {
     fun getUserById(token: String, userId: Int): Call<GetUserResponse>
     fun getAllUser(token: String): Call<GetAllUsersResponse>
     suspend fun saveUserToken(token: String)
+    suspend fun saveIsAdmin(isAdmin: Boolean)
     suspend fun saveUserId(userId: Int)
 }
 
@@ -50,6 +51,12 @@ class NetworkUserRepository(
     override suspend fun saveUserToken(token: String) {
         userDataStore.edit { preferences ->
             preferences[USER_TOKEN] = token
+        }
+    }
+
+    override suspend fun saveIsAdmin(isAdmin: Boolean) {
+        userDataStore.edit { preferences ->
+            preferences[IS_ADMIN] = isAdmin
         }
     }
 
