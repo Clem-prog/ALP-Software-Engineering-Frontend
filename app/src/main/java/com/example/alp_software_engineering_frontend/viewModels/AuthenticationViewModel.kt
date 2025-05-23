@@ -40,32 +40,18 @@ class AuthenticationViewModel(
     var dataStatus: AuthenticationStatusUIState by mutableStateOf(AuthenticationStatusUIState.Start)
         private set
 
-    var usernameInput by mutableStateOf("")
-        private set
-
     var passwordInput by mutableStateOf("")
         private set
 
     var emailInput by mutableStateOf("")
         private set
 
-    var isAdminInput by mutableStateOf(false)
-        private set
-
     fun changeEmailInput(emailInput: String) {
         this.emailInput = emailInput
     }
 
-    fun changeUsernameInput(usernameInput: String) {
-        this.usernameInput = usernameInput
-    }
-
     fun changePasswordInput(passwordInput: String) {
         this.passwordInput = passwordInput
-    }
-
-    fun changeIsAdminInput(isAdminInput: Boolean) {
-        this.isAdminInput = isAdminInput
     }
 
     fun loginUser(
