@@ -1,5 +1,6 @@
 package com.example.alp_software_engineering_frontend.models
 
+import com.example.alp_software_engineering_frontend.enums.PaymentEnum
 import java.util.Date
 
 data class GetAllRoomsResponse (

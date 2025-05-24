@@ -14,7 +14,7 @@ import retrofit2.http.Path
 
 interface PaymentAPIService {
     @GET("api/payments")
-    fun getAllPayments (@Header("X-API-TOKEN") token: String): Call<GetAllPaymentsResponse>
+    fun getAllPayments (@Header("X-API-TOKEN") token: String, @Path("roomid") roomId: Int): Call<GetAllPaymentsResponse>
 
     @GET("api/payments/latest/{roomid}")
     fun getLatestPayment (@Header("X-API-TOKEN") token: String, @Path("roomid") roomId: Int): Call<GetPaymentResponse>

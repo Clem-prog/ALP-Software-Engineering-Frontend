@@ -8,7 +8,7 @@ import com.example.alp_software_engineering_frontend.services.PaymentAPIService
 import retrofit2.Call
 
 interface PaymentRepository {
-    fun getAllPayments(token: String): Call<GetAllPaymentsResponse>
+    fun getAllPayments(token: String, roomId: Int): Call<GetAllPaymentsResponse>
     fun getLatestPayment(token: String, roomId: Int): Call<GetPaymentResponse>
     fun createPayment(token: String, request: PaymentRequest): Call<GetPaymentResponse>
     fun deletePayment(token: String, paymentId: Int): Call<GeneralResponseModel>
@@ -18,8 +18,8 @@ class NetworkPaymentRepository(
     private val paymentAPIService: PaymentAPIService
 ): PaymentRepository {
 
-    override fun getAllPayments(token: String): Call<GetAllPaymentsResponse> {
-        return paymentAPIService.getAllPayments(token)
+    override fun getAllPayments(token: String, roomId: Int): Call<GetAllPaymentsResponse> {
+        return paymentAPIService.getAllPayments(token, roomId)
     }
 
     override fun getLatestPayment(token: String, roomId: Int): Call<GetPaymentResponse> {

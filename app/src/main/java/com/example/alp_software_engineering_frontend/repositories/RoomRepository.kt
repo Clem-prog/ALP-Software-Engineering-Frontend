@@ -8,7 +8,7 @@ import retrofit2.Call
 interface RoomRepository {
     fun getRoomById(token: String, roomId: Int): Call<GetRoomResponse>
     fun getAllRooms(token: String): Call<GetAllRoomsResponse>
-    fun updateRoomStatus(token: String, roomId: Int, request: RoomUpdateRequest): Call<GetRoomResponse>
+    fun updateRoomStatus(token: String, roomId: Int, paymentStatus: String): Call<GetRoomResponse>
 }
 
 class NetworkRoomRepository(
@@ -23,8 +23,8 @@ class NetworkRoomRepository(
         return roomAPIService.getAllRooms(token)
     }
 
-    override fun updateRoomStatus(token: String, roomId: Int, request: RoomUpdateRequest): Call<GetRoomResponse> {
-        return roomAPIService.updateRoomStatus(token, roomId, request)
+    override fun updateRoomStatus(token: String, roomId: Int, paymentStatus: String): Call<GetRoomResponse> {
+        return roomAPIService.updateRoomStatus(token, roomId, RoomUpdateRequest(paymentStatus))
     }
 }
 
