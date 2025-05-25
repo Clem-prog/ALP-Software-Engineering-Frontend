@@ -20,8 +20,7 @@ data class PaymentModel (
 data class PaymentRequest (
     val transfer_receipt: String,
     val date: Date,
-    val roomId: Int,
-    val userId: Int
+    val roomId: Int
 )
 
 
