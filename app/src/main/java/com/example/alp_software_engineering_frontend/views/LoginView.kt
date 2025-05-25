@@ -28,7 +28,7 @@ fun LoginView() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF224B37)),
+            .background(Color(0xFF0C3A2D)),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -39,8 +39,8 @@ fun LoginView() {
         ) {
             Text(
                 text = "Dirty Rent Done\nDirt Cheap",
-                color = Color(0xFFF8D74A),
-                fontSize = 32.sp,
+                color = Color(0xFFF9BD02),
+                fontSize = 35.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 lineHeight = 36.sp,
@@ -62,15 +62,15 @@ fun LoginView() {
                 ) {
                     Text(
                         text = "Login",
-                        fontSize = 28.sp,
+                        fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF333333),
+                        color = Color(0xFF0C3A2D),
                         modifier = Modifier.padding(bottom = 20.dp)
                     )
 
                     Text(
                         text = "Email",
-                        color = Color(0xFF555555),
+                        color = Color(0xFF0C3A2D),
                         fontSize = 14.sp,
                         modifier = Modifier.padding(start = 4.dp, bottom = 0.dp)
                     )
@@ -94,7 +94,7 @@ fun LoginView() {
 
                     Text(
                         text = "Password",
-                        color = Color(0xFF555555),
+                        color = Color(0xFF0C3A2D),
                         fontSize = 14.sp,
                         modifier = Modifier.padding(start = 4.dp, bottom = 0.dp)
                     )
@@ -123,7 +123,7 @@ fun LoginView() {
                             .fillMaxWidth()
                             .height(50.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF7E9D7B),
+                            containerColor = Color(0xFF6D9773),
                             contentColor = Color.White
                         ),
                         shape = RoundedCornerShape(12.dp)
