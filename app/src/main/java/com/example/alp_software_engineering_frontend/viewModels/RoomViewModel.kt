@@ -16,7 +16,6 @@ import com.example.alp_software_engineering_frontend.enums.PaymentEnum
 import com.example.alp_software_engineering_frontend.models.ErrorModel
 import com.example.alp_software_engineering_frontend.models.GetAllRoomsResponse
 import com.example.alp_software_engineering_frontend.models.GetRoomResponse
-import com.example.alp_software_engineering_frontend.models.RoomUpdateRequest
 import com.example.alp_software_engineering_frontend.repositories.RoomRepository
 import com.example.alp_software_engineering_frontend.uiStates.RoomDataStatusUIState
 import com.google.gson.Gson
@@ -31,13 +30,6 @@ class RoomViewModel(
 ) : ViewModel() {
     var dataStatus: RoomDataStatusUIState by mutableStateOf(RoomDataStatusUIState.Start)
         private set
-
-    var statusInput by mutableStateOf(PaymentEnum.unpaid)
-        private set
-
-    fun changeStatus(status: PaymentEnum) {
-        statusInput = status
-    }
 
     fun getAllRooms(
         token: String
@@ -69,6 +61,45 @@ class RoomViewModel(
                     }
 
                     override fun onFailure(call: Call<GetAllRoomsResponse>, t: Throwable) {
+                        dataStatus = RoomDataStatusUIState.Failed(t.localizedMessage)
+                    }
+                })
+            } catch (error: IOException) {
+                dataStatus = RoomDataStatusUIState.Failed(error.localizedMessage)
+            }
+        }
+    }
+
+    fun getRoomByOccupant(
+        token: String
+    ) {
+        viewModelScope.launch {
+            dataStatus = RoomDataStatusUIState.Loading
+
+            try {
+                val call = roomRepository.getRoomByOccupant(token)
+
+                call.enqueue(object : Callback<GetRoomResponse> {
+                    override fun onResponse(
+                        call: Call<GetRoomResponse>,
+                        res: Response<GetRoomResponse>
+                    ) {
+                        if (res.isSuccessful) {
+                            dataStatus = RoomDataStatusUIState.Success(res.body()!!.data)
+                        } else {
+                            val errorBody = res.errorBody()?.charStream()
+                            val errorMessage = if (errorBody != null) {
+                                Gson().fromJson(errorBody, ErrorModel::class.java)
+                            } else {
+                                null
+                            }
+
+                            val errorText = errorMessage?.errors ?: "Unknown error occurred"
+                            dataStatus = RoomDataStatusUIState.Failed(errorText)
+                        }
+                    }
+
+                    override fun onFailure(call: Call<GetRoomResponse>, t: Throwable) {
                         dataStatus = RoomDataStatusUIState.Failed(t.localizedMessage)
                     }
                 })
@@ -117,12 +148,12 @@ class RoomViewModel(
         }
     }
 
-    fun updateRoomStatus(token: String, eventId: Int, statusInput: PaymentEnum) {
+    fun updateRoomStatus(token: String, eventId: Int, status: PaymentEnum) {
         viewModelScope.launch {
             dataStatus = RoomDataStatusUIState.Loading
 
             try {
-                val call = roomRepository.updateRoomStatus(token, eventId, statusInput.toString())
+                val call = roomRepository.updateRoomStatus(token, eventId, status.toString())
 
                 call.enqueue(object: Callback<GetRoomResponse>  {
                     override fun onResponse(

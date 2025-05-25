@@ -71,7 +71,10 @@ class NetworkUserRepository(
     }
 
 
-    override fun getUserById(token: String, userId: Int): Call<GetUserResponse> {
+    override fun getUserById(
+        token: String,
+        userId: Int
+    ): Call<GetUserResponse> {
         return userAPIService.getUserById(token, userId)
     }
 

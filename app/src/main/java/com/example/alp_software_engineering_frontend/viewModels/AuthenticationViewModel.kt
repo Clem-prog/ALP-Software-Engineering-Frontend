@@ -168,6 +168,25 @@ class AuthenticationViewModel(
         }
     }
 
+    fun checkForm() {
+        if (
+            emailInput.isNotEmpty() &&
+            passwordInput.isNotEmpty()
+        ) {
+            _authenticationUIState.update { currentState ->
+                currentState.copy(
+                    buttonEnabled = true
+                )
+            }
+        } else {
+            _authenticationUIState.update { currentState ->
+                currentState.copy(
+                    buttonEnabled = false
+                )
+            }
+        }
+    }
+
     fun resetViewModel() {
         changeEmailInput("")
         changePasswordInput("")
