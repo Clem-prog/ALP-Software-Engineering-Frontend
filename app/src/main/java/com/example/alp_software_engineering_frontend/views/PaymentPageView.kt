@@ -16,10 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.alp_software_engineering_frontend.R
 
 @Composable
 fun TenantPaymentPageView(
@@ -30,7 +32,7 @@ fun TenantPaymentPageView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 40.dp, start = 20.dp, end = 20.dp, bottom = 20.dp),
+            .padding(top = 80.dp, start = 20.dp, end = 20.dp, bottom = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -41,7 +43,7 @@ fun TenantPaymentPageView(
         )
         Text(
             text = paymentAmount,
-            color = Color(0xFFF8D74A),
+            color = Color(0xFFF9BD02),
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 30.dp)
@@ -73,8 +75,8 @@ fun TenantPaymentPageView(
             modifier = Modifier
                 .fillMaxWidth(0.85f)
                 .height(180.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.White)
+                .clip(RoundedCornerShape(20.dp))
+                .background(Color(0xFFF5F5F5))
                 .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp))
                 .clickable { /* TODO: Handle image upload */ },
             contentAlignment = Alignment.Center
@@ -83,11 +85,11 @@ fun TenantPaymentPageView(
                 imageVector = Icons.Filled.Add,
                 contentDescription = "Upload Receipt",
                 tint = Color.Gray,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(40.dp)
             )
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = { /* TODO: Handle submit */ },
@@ -110,7 +112,7 @@ fun TenantPaymentPageView(
 fun TenantPaymentPagePreview() {
     MaterialTheme {
         Scaffold(
-            containerColor = Color(0xFF224B37),
+            containerColor = Color(0xFF0C3A2D),
             bottomBar = {
                 NavigationBar(containerColor = Color(0xFF7E9D7B)) {
                     NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Default.Home, "")})
