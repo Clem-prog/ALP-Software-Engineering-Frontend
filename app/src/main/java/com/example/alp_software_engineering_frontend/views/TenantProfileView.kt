@@ -44,9 +44,9 @@ fun TenantProfileView(
         ) {
             Text(
                 text = "Tenant Profile",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF224B37),
+                fontSize = 30.sp,
+                fontWeight = FontWeight(700),
+                color = Color(0xFF0C3A2D),
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
@@ -71,15 +71,15 @@ fun ProfileDetailItem(label: String, value: String, modifier: Modifier = Modifie
     Column(modifier = modifier.padding(bottom = 16.dp)) {
         Text(
             text = label,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color(0xFF555555)
+            fontSize = 20.sp,
+            fontWeight = FontWeight(700),
+            color = Color(0xFF0C3A2D)
         )
         Text(
             text = value,
-            fontSize = 18.sp,
-            color = Color(0xFF224B37),
-            fontWeight = FontWeight.Normal
+            fontSize = 20.sp,
+            color = Color(0xFF0C3A2D),
+            fontWeight = FontWeight(400)
         )
     }
 }
