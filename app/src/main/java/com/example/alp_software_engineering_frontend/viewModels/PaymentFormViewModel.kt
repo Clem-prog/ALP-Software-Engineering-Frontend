@@ -17,7 +17,6 @@ import com.example.alp_software_engineering_frontend.D4C
 import com.example.alp_software_engineering_frontend.models.ErrorModel
 import com.example.alp_software_engineering_frontend.models.GetPaymentResponse
 import com.example.alp_software_engineering_frontend.repositories.PaymentRepository
-import com.example.alp_software_engineering_frontend.uiStates.AuthenticationStatusUIState
 import com.example.alp_software_engineering_frontend.uiStates.PaymentDataStatusUIState
 import com.example.alp_software_engineering_frontend.uiStates.PaymentUIState
 import com.google.gson.Gson
@@ -45,6 +44,7 @@ class PaymentFormViewModel(
     private val paymentRepository: PaymentRepository
 ) : ViewModel() {
     private val _paymentUIState = MutableStateFlow(PaymentUIState())
+
     val paymentUIState: StateFlow<PaymentUIState>
         get() {
             return _paymentUIState.asStateFlow()
@@ -215,7 +215,7 @@ class PaymentFormViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as D4C)
                 val paymentRepository = application.container.paymentRepository
-                PaymentViewModel(paymentRepository)
+                PaymentFormViewModel(paymentRepository)
             }
         }
     }
