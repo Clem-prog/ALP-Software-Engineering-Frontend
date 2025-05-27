@@ -17,51 +17,95 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.alp_software_engineering_frontend.uiStates.RoomDataStatusUIState
+import com.example.alp_software_engineering_frontend.uiStates.UserDataStatusUIState
+import com.example.alp_software_engineering_frontend.viewModels.RoomViewModel
+import com.example.alp_software_engineering_frontend.viewModels.UserViewModel
 
 @Composable
 fun TenantProfileView(
-    modifier: Modifier = Modifier,
-    name: String = "Igny Romy",
-    roomNumber: String = "321",
-    email: String = "iromy@gmail.com",
-    phoneNumber: String = "1234567890",
-    age: Int = 20,
-    gender: String = "Male"
+    token: String,
+    userId: Int,
+    userViewModel: UserViewModel,
+    roomViewModel: RoomViewModel
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(top = 40.dp, start = 20.dp, end = 20.dp),
-        contentAlignment = Alignment.TopCenter
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.White)
-                .padding(24.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Text(
-                text = "Tenant Profile",
-                fontSize = 30.sp,
-                fontWeight = FontWeight(700),
-                color = Color(0xFF0C3A2D),
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
+    if (token.isNotEmpty()) {
+        LaunchedEffect(token) {
+            userViewModel.getUserById(token, userId)
+            roomViewModel.getRoomByOccupant(token)
+        }
+    }
 
-            ProfileDetailItem(label = "Name", value = name)
-            ProfileDetailItem(label = "Room Number", value = roomNumber)
-            ProfileDetailItem(label = "Email", value = email)
-            ProfileDetailItem(label = "Phone Number", value = phoneNumber)
+    val dataStatus = userViewModel.dataStatus
+    val room = roomViewModel.dataStatus
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                ProfileDetailItem(label = "Age", value = age.toString(), modifier = Modifier.weight(1f))
-                ProfileDetailItem(label = "Gender", value = gender, modifier = Modifier.weight(1f))
+    when (dataStatus) {
+        is UserDataStatusUIState.Success -> {
+            when (room) {
+                is RoomDataStatusUIState.Success -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 40.dp, start = 20.dp, end = 20.dp),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color.White)
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Text(
+                                text = "Tenant Profile",
+                                fontSize = 30.sp,
+                                fontWeight = FontWeight(700),
+                                color = Color(0xFF0C3A2D),
+                                modifier = Modifier.padding(bottom = 24.dp)
+                            )
+
+                            ProfileDetailItem(label = "Name", value = dataStatus.userModelData.name)
+                            ProfileDetailItem(
+                                label = "Room Number",
+                                value = room.roomModelData.room_number
+                            )
+                            ProfileDetailItem(
+                                label = "Email",
+                                value = dataStatus.userModelData.email
+                            )
+                            ProfileDetailItem(
+                                label = "Phone Number",
+                                value = dataStatus.userModelData.phone_number
+                            )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                ProfileDetailItem(
+                                    label = "Age",
+                                    value = dataStatus.userModelData.age,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                ProfileDetailItem(
+                                    label = "Gender",
+                                    value = dataStatus.userModelData.gender,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                is RoomDataStatusUIState.Failed -> {
+                    Text("Failed to load data: ${room.errorMessage}")
+                }
             }
+        }
+        is UserDataStatusUIState.Failed -> {
+            Text("Failed to load user: ${dataStatus.errorMessage}")
         }
     }
 }
@@ -84,7 +128,6 @@ fun ProfileDetailItem(label: String, value: String, modifier: Modifier = Modifie
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun TenantProfilePreview() {
@@ -99,7 +142,13 @@ fun TenantProfilePreview() {
                 }
             }
         ) { innerPadding ->
-            TenantProfileView(modifier = Modifier.padding(innerPadding))
+            Column(modifier = Modifier.padding(innerPadding)) {  }
+            TenantProfileView(
+                token = "",
+                userId = 0,
+                userViewModel = viewModel(),
+                roomViewModel = viewModel()
+            )
         }
     }
 }
