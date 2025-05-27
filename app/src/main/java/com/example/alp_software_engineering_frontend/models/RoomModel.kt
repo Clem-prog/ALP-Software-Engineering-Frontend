@@ -18,7 +18,8 @@ data class RoomModel (
     val pricePerMonth: Double,
     val dueDate: Date,
     val paymentStatus: String,
-    val occupantId: Int?
+    val occupantId: Int?,
+    val occupant: UserModel
 )
 
 data class RoomUpdateRequest (

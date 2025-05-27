@@ -14,8 +14,8 @@ interface RoomAPIService {
     @GET("api/rooms")
     fun getAllRooms (@Header("X-API-TOKEN") token: String): Call<GetAllRoomsResponse>
 
-    @GET("api/rooms/{id}")
-    fun getRoomById (@Header("X-API-TOKEN") token: String, @Path("id") roomId: Int): Call<GetRoomResponse>
+    @GET("api/rooms/{roomid}")
+    fun getRoomById (@Header("X-API-TOKEN") token: String, @Path("roomid") roomId: Int): Call<GetRoomResponse>
 
     @GET("/api/rooms/occupant")
     fun getRoomByOccupant (@Header("X-API-TOKEN") token: String): Call<GetRoomResponse>

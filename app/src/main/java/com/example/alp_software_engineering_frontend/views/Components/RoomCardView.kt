@@ -1,6 +1,7 @@
 package com.example.alp_software_engineering_frontend.views.Components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -16,6 +17,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.alp_software_engineering_frontend.enums.PaymentEnum
+import java.time.LocalDate
+import java.time.temporal.TemporalQueries.localDate
+import java.util.Date
 
 //Room icon are changed to house icon since im not sure if a room icon exist
 
@@ -23,7 +28,9 @@ import androidx.compose.ui.unit.sp
 fun RoomCardView(
     room_Number: String = "321",
     tenantName: String = "Vivian",
-    dueDate: Int = 22
+    dueDate: Int = 22,
+    status: PaymentEnum,
+    onClickCard: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -31,6 +38,7 @@ fun RoomCardView(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(Color.White)
+            .clickable { onClickCard() }
     ) {
         Row(
             modifier = Modifier
@@ -79,12 +87,25 @@ fun RoomCardView(
             }
             // This is basically the space between the House icon and the rest of the text
             Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                imageVector = Icons.Filled.Info,
-                contentDescription = "Information",
-                tint = Color(0xFF4A4A4A),
-                modifier = Modifier.size(24.dp)
-            )
+            when (status) {
+                PaymentEnum.unpaid -> {
+                    Icon(
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = "Information",
+                        tint = Color(0xFF4A4A4A),
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                PaymentEnum.paid -> {
+
+                }
+
+                PaymentEnum.pending -> {
+
+                }
+            }
+
         }
     }
 }
@@ -100,7 +121,12 @@ fun RoomCardPreview() {
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
-            RoomCardView()
+            RoomCardView(
+                room_Number = "",
+                tenantName = "",
+                dueDate = 22,
+                status = PaymentEnum.paid
+            )
         }
     }
 }

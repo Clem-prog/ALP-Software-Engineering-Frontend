@@ -13,6 +13,9 @@ data class UserModel (
     val name: String,
     val email: String,
     val password: String,
+    val phone_number: String,
+    val age: String,
+    val gender: String,
     val isAdmin: Boolean,
     val token: String?
 )
