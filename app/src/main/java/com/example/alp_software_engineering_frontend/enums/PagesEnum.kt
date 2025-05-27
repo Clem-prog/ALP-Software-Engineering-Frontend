@@ -2,7 +2,14 @@ package com.example.alp_software_engineering_frontend.enums
 
 enum class PagesEnum() {
     Login,
-    Payment,
+
+    //tenant
     HomeTenant,
-    HomeAdmin
+    Payment,
+    Profile,
+
+    //admin
+    HomeAdmin,
+    RoomInfo,
+    PaymentHistory
 }
