@@ -13,7 +13,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface PaymentAPIService {
-    @GET("api/payments")
+    @GET("api/payments/{roomid}")
     fun getAllPayments (@Header("X-API-TOKEN") token: String, @Path("roomid") roomId: Int): Call<GetAllPaymentsResponse>
 
     @GET("api/payments/latest/{roomid}")

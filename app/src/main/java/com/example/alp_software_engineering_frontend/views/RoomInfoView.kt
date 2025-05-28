@@ -23,14 +23,18 @@ import androidx.compose.ui.unit.sp
 import com.example.alp_software_engineering_frontend.models.RoomModel
 import com.example.alp_software_engineering_frontend.R
 import java.text.SimpleDateFormat
+import coil.compose.rememberAsyncImagePainter
 import java.util.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.alp_software_engineering_frontend.enums.PagesEnum
 import com.example.alp_software_engineering_frontend.enums.PaymentEnum
 import com.example.alp_software_engineering_frontend.models.UserModel
+import com.example.alp_software_engineering_frontend.uiStates.PaymentDataStatusUIState
 import com.example.alp_software_engineering_frontend.uiStates.RoomDataStatusUIState
+import com.example.alp_software_engineering_frontend.viewModels.PaymentViewModel
 import com.example.alp_software_engineering_frontend.viewModels.RoomViewModel
 import java.util.Date
 
@@ -39,19 +43,22 @@ fun RoomInfoView(
     roomId: Int,
     token: String,
     roomViewModel: RoomViewModel,
+    paymentViewModel: PaymentViewModel,
     status: PaymentEnum,
     navController: NavController,
     receiptPainter: Painter? = null
 ) {
     LaunchedEffect(token) {
         roomViewModel.getRoomById(token, roomId)
+        paymentViewModel.getLatestPayment(token, roomId)
     }
+
     val room = roomViewModel.dataStatus
+    val payment = paymentViewModel.dataStatus
 
     when (room) {
         is RoomDataStatusUIState.Success -> {
-            val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-            val dueDateStr = dateFormat.format(room.roomModelData.dueDate)
+            val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
 
             Column(
                 modifier = Modifier
@@ -80,7 +87,7 @@ fun RoomInfoView(
                 // Detail cards
                 listOf(
                     "Tenant:" to room.roomModelData.occupant.name,
-                    "Rent Due:" to dueDateStr,
+                    "Rent Due:" to formatter.format(room.roomModelData.dueDate),
                     "Room Type:" to room.roomModelData.room_type,
                     "Payment Status:" to room.roomModelData.paymentStatus
                 ).forEach { (label, value) ->
@@ -117,7 +124,7 @@ fun RoomInfoView(
                         ) {
                             Button(
                                 onClick = {
-                                    //open payment history
+                                    navController.navigate("${PagesEnum.PaymentHistory.name}/${room.roomModelData.id}")
                                 },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7E9D7B))
@@ -134,7 +141,7 @@ fun RoomInfoView(
                         ) {
                             Button(
                                 onClick = {
-                                    //open payment history
+                                    navController.navigate("${PagesEnum.PaymentHistory.name}/${room.roomModelData.id}")
                                 },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7E9D7B))
@@ -154,54 +161,71 @@ fun RoomInfoView(
                     }
 
                     PaymentEnum.pending -> {
-                        Text(
-                            text = "Transfer Receipt",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.White,
-                            modifier = Modifier
-                                .align(Alignment.Start)
-                                .padding(start = 8.dp, bottom = 4.dp)
-                        )
+                        when (payment) {
+                            is PaymentDataStatusUIState.Success -> {
+                                val painter = rememberAsyncImagePainter(payment.paymentModelData.transfer_receipt)
 
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(180.dp)
-                                .background(Color.White, RoundedCornerShape(8.dp))
-                                .padding(8.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            /*Image(
-                                painter = receiptPainter,
-                                contentDescription = "Receipt Image",
-                                modifier = Modifier.fillMaxSize()
-                            )*/ //TODO: IMAGE HANDLING
-                        }
+                                Text(
+                                    text = "Transfer Receipt",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.White,
+                                    modifier = Modifier
+                                        .align(Alignment.Start)
+                                        .padding(start = 8.dp, bottom = 4.dp)
+                                )
 
-                        Spacer(Modifier.height(16.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(180.dp)
+                                        .background(Color.White, RoundedCornerShape(8.dp))
+                                        .padding(8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Image(
+                                        painter = painter,
+                                        contentDescription = "Receipt Image",
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
 
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Button(
-                                onClick = {
-                                    //disapprove
-                                },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
-                            ) {
-                                Text("Disapprove", fontSize = 16.sp, color = Color.White)
-                            }
-                            Button(
-                                onClick = {
-                                    //approve
-                                },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7E9D7B))
-                            ) {
-                                Text("Approve", fontSize = 16.sp, color = Color.White)
+                                Text(
+                                    text = "Sent in: ${formatter.format(payment.paymentModelData.date)}",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.White,
+                                    modifier = Modifier
+                                        .align(Alignment.Start)
+                                        .padding(top = 8.dp, bottom = 4.dp)
+                                )
+
+                                Spacer(Modifier.height(16.dp))
+
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Button(
+                                        onClick = {
+                                            paymentViewModel.deletePayment(token, payment.paymentModelData.id)
+                                            roomViewModel.updateRoomStatus(token, room.roomModelData.id, PaymentEnum.unpaid, navController)
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+                                    ) {
+                                        Text("Disapprove", fontSize = 16.sp, color = Color.White)
+                                    }
+                                    Button(
+                                        onClick = {
+                                            roomViewModel.updateRoomStatus(token, room.roomModelData.id, PaymentEnum.paid, navController)
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7E9D7B))
+                                    ) {
+                                        Text("Approve", fontSize = 16.sp, color = Color.White)
+                                    }
+                                }
                             }
                         }
                     }
@@ -240,6 +264,7 @@ fun RoomInfoViewPreview_Unpaid() {
         roomId = 0,
         token = "TODO()",
         roomViewModel = viewModel(),
+        paymentViewModel = viewModel(),
         status = PaymentEnum.unpaid,
         navController = rememberNavController(),
     )

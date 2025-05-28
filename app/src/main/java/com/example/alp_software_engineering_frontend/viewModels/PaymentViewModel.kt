@@ -107,12 +107,12 @@ class PaymentViewModel(
         }
     }
 
-    fun deletePayment(token: String, eventId: Int) {
+    fun deletePayment(token: String, paymentId: Int) {
         viewModelScope.launch {
             dataStatus = PaymentDataStatusUIState.Loading
 
             try {
-                val call = paymentRepository.deletePayment(token, eventId)
+                val call = paymentRepository.deletePayment(token, paymentId)
 
                 call.enqueue(object: Callback<GeneralResponseModel> {
                     override fun onResponse(
