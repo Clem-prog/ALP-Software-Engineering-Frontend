@@ -97,7 +97,23 @@ fun D4C(
                 token = token.value,
                 status = PaymentEnum.valueOf(status!!),
                 roomViewModel = roomViewModel,
-                navController = navController,
+                paymentViewModel = paymentViewModel,
+                navController = navController
+            )
+        }
+
+        composable(
+            route = "${PagesEnum.PaymentHistory.name}/{roomId}",
+            arguments = listOf(
+                navArgument("roomId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("roomId")
+            PaymentHistoryView(
+                roomViewModel = roomViewModel,
+                paymentViewModel = paymentViewModel,
+                roomId = id!!,
+                token = token.value
             )
         }
 

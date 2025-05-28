@@ -1,4 +1,5 @@
 package com.example.alp_software_engineering_frontend.repositories
+import com.example.alp_software_engineering_frontend.models.GeneralResponseModel
 import com.example.alp_software_engineering_frontend.models.GetAllRoomsResponse
 import com.example.alp_software_engineering_frontend.models.GetRoomResponse
 import com.example.alp_software_engineering_frontend.models.RoomUpdateRequest
@@ -9,7 +10,7 @@ interface RoomRepository {
     fun getRoomById(token: String, roomId: Int): Call<GetRoomResponse>
     fun getAllRooms(token: String): Call<GetAllRoomsResponse>
     fun getRoomByOccupant(token: String): Call<GetRoomResponse>
-    fun updateRoomStatus(token: String, roomId: Int, paymentStatus: String): Call<GetRoomResponse>
+    fun updateRoomStatus(token: String, roomId: Int, paymentStatus: String): Call<GeneralResponseModel>
 }
 
 class NetworkRoomRepository(
@@ -35,7 +36,7 @@ class NetworkRoomRepository(
         token: String,
         roomId: Int,
         paymentStatus: String
-    ): Call<GetRoomResponse> {
+    ): Call<GeneralResponseModel> {
         return roomAPIService.updateRoomStatus(token, roomId, RoomUpdateRequest(paymentStatus))
     }
 }

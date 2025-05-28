@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
@@ -17,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.alp_software_engineering_frontend.R
 import com.example.alp_software_engineering_frontend.enums.PaymentEnum
 import java.time.LocalDate
 import java.time.temporal.TemporalQueries.localDate
@@ -102,6 +104,12 @@ fun RoomCardView(
                 }
 
                 PaymentEnum.pending -> {
+                    Icon(
+                        imageVector = Icons.Filled.AccessTime,
+                        contentDescription = "Clock",
+                        tint = Color(0xFFDAA520),
+                        modifier = Modifier.size(24.dp)
+                    )
 
                 }
             }
