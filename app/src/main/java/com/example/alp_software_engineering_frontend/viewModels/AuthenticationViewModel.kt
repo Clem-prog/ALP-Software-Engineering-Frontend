@@ -170,8 +170,8 @@ class AuthenticationViewModel(
 
     fun checkForm() {
         if (
-            emailInput.isNotEmpty() &&
-            passwordInput.isNotEmpty()
+            emailInput.isNotBlank() &&
+            passwordInput.isNotBlank()
         ) {
             _authenticationUIState.update { currentState ->
                 currentState.copy(
@@ -196,6 +196,10 @@ class AuthenticationViewModel(
             )
         }
 
+        dataStatus = AuthenticationStatusUIState.Start
+    }
+
+    fun clearErrorMessage() {
         dataStatus = AuthenticationStatusUIState.Start
     }
 

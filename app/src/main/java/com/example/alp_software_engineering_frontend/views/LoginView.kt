@@ -1,10 +1,13 @@
 // LoginView.kt
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,11 +22,44 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.alp_software_engineering_frontend.uiStates.AuthenticationStatusUIState
+import com.example.alp_software_engineering_frontend.uiStates.AuthenticationUIState
+import com.example.alp_software_engineering_frontend.viewModels.AuthenticationViewModel
 
 @Composable
-fun LoginView() {
-    var emailInput by remember { mutableStateOf("") }
-    var passwordInput by remember { mutableStateOf("") }
+fun LoginView(
+    navController: NavHostController,
+    authenticationViewModel: AuthenticationViewModel,
+    context: Context
+) {
+    val authenticationUIState by authenticationViewModel.authenticationUIState.collectAsState()
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+
+    LaunchedEffect(authenticationViewModel.dataStatus) {
+        val dataStatus = authenticationViewModel.dataStatus
+        if (dataStatus is AuthenticationStatusUIState.Failed) {
+            errorMessage = dataStatus.errorMessage
+            showErrorDialog = true
+            authenticationViewModel.clearErrorMessage()
+        }
+    }
+
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { showErrorDialog = false },
+            confirmButton = {
+                TextButton(onClick = { showErrorDialog = false }) {
+                    Text("OK")
+                }
+            },
+            title = { Text("Login Failed") },
+            text = { Text(errorMessage) }
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -75,8 +111,11 @@ fun LoginView() {
                         modifier = Modifier.padding(start = 4.dp, bottom = 0.dp)
                     )
                     OutlinedTextField(
-                        value = emailInput,
-                        onValueChange = { emailInput = it },
+                        value = authenticationViewModel.emailInput,
+                        onValueChange = {
+                            authenticationViewModel.changeEmailInput(it)
+                            authenticationViewModel.checkForm()
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,
@@ -99,8 +138,11 @@ fun LoginView() {
                         modifier = Modifier.padding(start = 4.dp, bottom = 0.dp)
                     )
                     OutlinedTextField(
-                        value = passwordInput,
-                        onValueChange = { passwordInput = it },
+                        value = authenticationViewModel.passwordInput,
+                        onValueChange = {
+                            authenticationViewModel.changePasswordInput(it)
+                            authenticationViewModel.checkForm()
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,
@@ -118,7 +160,9 @@ fun LoginView() {
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Button(
-                        onClick = { },
+                        onClick = {
+                            authenticationViewModel.loginUser(navController = navController)
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
@@ -126,7 +170,8 @@ fun LoginView() {
                             containerColor = Color(0xFF6D9773),
                             contentColor = Color.White
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = authenticationUIState.buttonEnabled
                     ) {
                         Text("Log In", fontSize = 16.sp, fontWeight = FontWeight.Medium)
                     }
@@ -140,6 +185,10 @@ fun LoginView() {
 @Composable
 fun LoginPreview() {
     MaterialTheme {
-        LoginView()
+        LoginView(
+            authenticationViewModel = viewModel(),
+            navController = rememberNavController(),
+            context = LocalContext.current
+        )
     }
 }

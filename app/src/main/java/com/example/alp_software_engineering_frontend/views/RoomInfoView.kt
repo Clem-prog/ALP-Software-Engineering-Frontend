@@ -1,5 +1,6 @@
 package com.example.alp_software_engineering_frontend.views
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,161 +23,212 @@ import androidx.compose.ui.unit.sp
 import com.example.alp_software_engineering_frontend.models.RoomModel
 import com.example.alp_software_engineering_frontend.R
 import java.text.SimpleDateFormat
+import coil.compose.rememberAsyncImagePainter
 import java.util.*
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.alp_software_engineering_frontend.enums.PagesEnum
+import com.example.alp_software_engineering_frontend.enums.PaymentEnum
+import com.example.alp_software_engineering_frontend.models.UserModel
+import com.example.alp_software_engineering_frontend.uiStates.PaymentDataStatusUIState
+import com.example.alp_software_engineering_frontend.uiStates.RoomDataStatusUIState
+import com.example.alp_software_engineering_frontend.viewModels.PaymentViewModel
+import com.example.alp_software_engineering_frontend.viewModels.RoomViewModel
 import java.util.Date
 
 @Composable
 fun RoomInfoView(
-    room: RoomModel,
-    tenantName: String,
-    receiptPainter: Painter? = null,
-    onBack: () -> Unit,
-    onPaymentHistory: () -> Unit,
-    onRemindRent: () -> Unit,
-    onApprove: () -> Unit,
-    onDisapprove: () -> Unit
+    roomId: Int,
+    token: String,
+    roomViewModel: RoomViewModel,
+    paymentViewModel: PaymentViewModel,
+    status: PaymentEnum,
+    navController: NavController,
+    receiptPainter: Painter? = null
 ) {
-    val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-    val dueDateStr = dateFormat.format(room.dueDate)
+    LaunchedEffect(token) {
+        roomViewModel.getRoomById(token, roomId)
+        paymentViewModel.getLatestPayment(token, roomId)
+    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF224B37))
-            .padding(horizontal = 16.dp)
-            .padding(top = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Back arrow
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onBack() }
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_arrow_back_ios_new_24),
-                contentDescription = "Back",
-                tint = Color.White
-            )
-        }
+    val room = roomViewModel.dataStatus
+    val payment = paymentViewModel.dataStatus
 
-        Spacer(Modifier.height(24.dp))
+    when (room) {
+        is RoomDataStatusUIState.Success -> {
+            val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
 
-        // Room number badge
-        Box(
-            modifier = Modifier
-                .background(Color(0xFF7E9D7B), RoundedCornerShape(8.dp))
-                .padding(horizontal = 32.dp, vertical = 12.dp)
-        ) {
-            Text(
-                text = room.room_number,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-        }
-
-        Spacer(Modifier.height(24.dp))
-
-        // Detail cards
-        listOf(
-            "Tenant:" to tenantName,
-            "Rent Due:" to dueDateStr,
-            "Room Type:" to room.room_type,
-            "Payment Status:" to room.paymentStatus
-        ).forEach { (label, value) ->
-            Box(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White, RoundedCornerShape(8.dp))
-                    .padding(12.dp)
+                    .fillMaxSize()
+                    .background(Color(0xFF224B37))
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 70.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column {
+                // Room number badge
+                Box(
+                    modifier = Modifier
+                        .background(Color(0xFF7E9D7B), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 32.dp, vertical = 12.dp)
+                ) {
                     Text(
-                        text = label,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = value,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.Black
+                        text = room.roomModelData.room_number,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
                     )
                 }
-            }
-            Spacer(Modifier.height(12.dp))
-        }
 
-        // if proof is submitted (status == "Pending"), show receipt and approve/disapprove
-        if (room.paymentStatus.equals("Pending", ignoreCase = true) && receiptPainter != null) {
-            Text(
-                text = "Transfer Receipt",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.White,
-                modifier = Modifier
-                    .align(Alignment.Start)
-                    .padding(start = 8.dp, bottom = 4.dp)
-            )
+                Spacer(Modifier.height(24.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .background(Color.White, RoundedCornerShape(8.dp))
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                androidx.compose.foundation.Image(
-                    painter = receiptPainter,
-                    contentDescription = "Receipt Image",
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Button(
-                    onClick = onDisapprove,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
-                ) {
-                    Text("Disapprove", fontSize = 16.sp, color = Color.White)
+                // Detail cards
+                listOf(
+                    "Tenant:" to room.roomModelData.occupant.name,
+                    "Rent Due:" to formatter.format(room.roomModelData.dueDate),
+                    "Room Type:" to room.roomModelData.room_type,
+                    "Payment Status:" to room.roomModelData.paymentStatus
+                ).forEach { (label, value) ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White, RoundedCornerShape(8.dp))
+                            .padding(12.dp)
+                    ) {
+                        Column {
+                            Text(
+                                text = label,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Black
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                text = value,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.Black
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(12.dp))
                 }
-                Button(
-                    onClick = onApprove,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7E9D7B))
-                ) {
-                    Text("Approve", fontSize = 16.sp, color = Color.White)
-                }
-            }
-        } else {
-            // otherwise show Payment History & Remind Rent
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Button(
-                    onClick = onPaymentHistory,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7E9D7B))
-                ) {
-                    Text("Payment History", fontSize = 16.sp, color = Color.White)
-                }
-                Button(
-                    onClick = onRemindRent,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF9BD02))
-                ) {
-                    Text("Remind rent", fontSize = 16.sp, color = Color.White)
+
+                when (status) {
+                    PaymentEnum.paid -> {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Button(
+                                onClick = {
+                                    navController.navigate("${PagesEnum.PaymentHistory.name}/${room.roomModelData.id}")
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7E9D7B))
+                            ) {
+                                Text("Payment History", fontSize = 16.sp, color = Color.White)
+                            }
+                        }
+                    }
+
+                    PaymentEnum.unpaid -> {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Button(
+                                onClick = {
+                                    navController.navigate("${PagesEnum.PaymentHistory.name}/${room.roomModelData.id}")
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7E9D7B))
+                            ) {
+                                Text("Payment History", fontSize = 16.sp, color = Color.White)
+                            }
+                            Button(
+                                onClick = {
+                                    //remind tenant
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF9BD02))
+                            ) {
+                                Text("Remind rent", fontSize = 16.sp, color = Color.White)
+                            }
+                        }
+                    }
+
+                    PaymentEnum.pending -> {
+                        when (payment) {
+                            is PaymentDataStatusUIState.Success -> {
+                                val painter = rememberAsyncImagePainter(payment.paymentModelData.transfer_receipt)
+
+                                Text(
+                                    text = "Transfer Receipt",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.White,
+                                    modifier = Modifier
+                                        .align(Alignment.Start)
+                                        .padding(start = 8.dp, bottom = 4.dp)
+                                )
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(180.dp)
+                                        .background(Color.White, RoundedCornerShape(8.dp))
+                                        .padding(8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Image(
+                                        painter = painter,
+                                        contentDescription = "Receipt Image",
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
+
+                                Text(
+                                    text = "Sent in: ${formatter.format(payment.paymentModelData.date)}",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.White,
+                                    modifier = Modifier
+                                        .align(Alignment.Start)
+                                        .padding(top = 8.dp, bottom = 4.dp)
+                                )
+
+                                Spacer(Modifier.height(16.dp))
+
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Button(
+                                        onClick = {
+                                            paymentViewModel.deletePayment(token, payment.paymentModelData.id)
+                                            roomViewModel.updateRoomStatus(token, room.roomModelData.id, PaymentEnum.unpaid, navController)
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+                                    ) {
+                                        Text("Disapprove", fontSize = 16.sp, color = Color.White)
+                                    }
+                                    Button(
+                                        onClick = {
+                                            roomViewModel.updateRoomStatus(token, room.roomModelData.id, PaymentEnum.paid, navController)
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7E9D7B))
+                                    ) {
+                                        Text("Approve", fontSize = 16.sp, color = Color.White)
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -193,43 +246,26 @@ fun RoomInfoViewPreview_Unpaid() {
         pricePerMonth = 2_200_000.0,
         dueDate = Date(),             // today
         paymentStatus = "Unpaid",
-        occupantId = 42
+        occupantId = 42,
+        occupant = UserModel(
+            id = 1,
+            name = "Igny Romy",
+            email = "TODO()",
+            password = "TODO()",
+            phone_number = "TODO()",
+            age = "TODO()",
+            gender = "TODO()",
+            isAdmin = false,
+            token = "TODO()"
+        )
     )
     RoomInfoView(
-        room = room,
-        tenantName = "Igny Romy",
         receiptPainter = null,
-        onBack = {},
-        onPaymentHistory = {},
-        onRemindRent = {},
-        onApprove = {},      // won't be shown in this preview
-        onDisapprove = {}    // won't be shown in this preview
-    )
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF224B37, name = "RoomInfo Pending")
-@Composable
-fun RoomInfoViewPreview_Pending() {
-    // sample RoomModel with pending status
-    val futureDate = Date(System.currentTimeMillis() + 5L * 24 * 60 * 60 * 1000) // in 5 days
-    val room = RoomModel(
-        id = 1,
-        room_number = "321",
-        room_type = "Big",
-        pricePerMonth = 2_200_000.0,
-        dueDate = futureDate,
-        paymentStatus = "Pending",
-        occupantId = 42
-    )
-    RoomInfoView(
-        room = room,
-        tenantName = "Igny Romy",
-        // placeholder receipt—replace with your actual drawable
-        receiptPainter = painterResource(id = R.drawable.baseline_wallet_24),
-        onBack = {},
-        onPaymentHistory = {},  // won't be shown in this preview
-        onRemindRent = {},      // won't be shown in this preview
-        onApprove = {},
-        onDisapprove = {}
+        roomId = 0,
+        token = "TODO()",
+        roomViewModel = viewModel(),
+        paymentViewModel = viewModel(),
+        status = PaymentEnum.unpaid,
+        navController = rememberNavController(),
     )
 }

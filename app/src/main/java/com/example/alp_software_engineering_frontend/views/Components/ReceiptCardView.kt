@@ -16,22 +16,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import coil.compose.rememberAsyncImagePainter
 import com.example.alp_software_engineering_frontend.R
+import com.example.alp_software_engineering_frontend.models.PaymentModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun ReceiptCardView(
-    date: String,
-    receiptPainter: Painter,
-    modifier: Modifier = Modifier
+    payment: PaymentModel
 ) {
+    val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+    val painter = rememberAsyncImagePainter(payment.transfer_receipt)
+
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .background(Color(0xFFF5F5F5), RoundedCornerShape(12.dp))
             .padding(16.dp)
     ) {
         Text(
-            text = "Date: $date",
+            text = "Date: ${formatter.format(payment.date)}",
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = Color.Black
@@ -53,7 +59,7 @@ fun ReceiptCardView(
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = receiptPainter,
+                painter = painter,
                 contentDescription = "Transfer receipt",
                 modifier = Modifier.fillMaxSize()
             )
@@ -65,9 +71,12 @@ fun ReceiptCardView(
 @Composable
 fun ReceiptCardViewPreview() {
     ReceiptCardView(
-        date = "17-08-1945",
-        receiptPainter = painterResource(id = R.drawable.baseline_wallet_24),
-        modifier = Modifier
-            .padding(16.dp)
+        payment = PaymentModel(
+            id = 0,
+            transfer_receipt = "",
+            date = Date(),
+            roomId = 0,
+            userId = 0
+        )
     )
 }

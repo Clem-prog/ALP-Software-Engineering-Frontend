@@ -1,5 +1,6 @@
 package com.example.alp_software_engineering_frontend.services
 
+import com.example.alp_software_engineering_frontend.models.GeneralResponseModel
 import com.example.alp_software_engineering_frontend.models.GetAllRoomsResponse
 import com.example.alp_software_engineering_frontend.models.GetRoomResponse
 import com.example.alp_software_engineering_frontend.models.RoomUpdateRequest
@@ -14,14 +15,14 @@ interface RoomAPIService {
     @GET("api/rooms")
     fun getAllRooms (@Header("X-API-TOKEN") token: String): Call<GetAllRoomsResponse>
 
-    @GET("api/rooms/{id}")
-    fun getRoomById (@Header("X-API-TOKEN") token: String, @Path("id") roomId: Int): Call<GetRoomResponse>
+    @GET("api/rooms/{roomid}")
+    fun getRoomById (@Header("X-API-TOKEN") token: String, @Path("roomid") roomId: Int): Call<GetRoomResponse>
 
     @GET("/api/rooms/occupant")
     fun getRoomByOccupant (@Header("X-API-TOKEN") token: String): Call<GetRoomResponse>
 
     @PUT("api/rooms/{id}")
-    fun updateRoomStatus(@Header("X-API-TOKEN") token: String, @Path("id") roomId: Int, @Body roomModel: RoomUpdateRequest): Call<GetRoomResponse>
+    fun updateRoomStatus(@Header("X-API-TOKEN") token: String, @Path("id") roomId: Int, @Body roomModel: RoomUpdateRequest): Call<GeneralResponseModel>
 }
 
 //if none of the things with {id} doesnt work, it may be because it's not {roomid}

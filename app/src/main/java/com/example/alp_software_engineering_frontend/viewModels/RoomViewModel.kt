@@ -10,10 +10,13 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.alp_software_engineering_frontend.D4C
+import com.example.alp_software_engineering_frontend.enums.PagesEnum
 import com.example.alp_software_engineering_frontend.enums.PaymentEnum
 import com.example.alp_software_engineering_frontend.models.ErrorModel
+import com.example.alp_software_engineering_frontend.models.GeneralResponseModel
 import com.example.alp_software_engineering_frontend.models.GetAllRoomsResponse
 import com.example.alp_software_engineering_frontend.models.GetRoomResponse
 import com.example.alp_software_engineering_frontend.repositories.RoomRepository
@@ -111,7 +114,7 @@ class RoomViewModel(
 
     fun getRoomById(
         token: String,
-        roomId: Int
+        roomId: Int,
     ) {
         viewModelScope.launch {
             dataStatus = RoomDataStatusUIState.Loading
@@ -121,7 +124,7 @@ class RoomViewModel(
 
                 call.enqueue(object : Callback<GetRoomResponse> {
                     override fun onResponse(
-                        call: Call<GetRoomResponse>, 
+                        call: Call<GetRoomResponse>,
                         res: Response<GetRoomResponse>
                     ) {
                         if (res.isSuccessful) {
@@ -148,26 +151,30 @@ class RoomViewModel(
         }
     }
 
-    fun updateRoomStatus(token: String, eventId: Int, status: PaymentEnum) {
+    fun updateRoomStatus(
+        token: String, eventId: Int,
+        status: PaymentEnum,
+        navController: NavController
+    ) {
         viewModelScope.launch {
             dataStatus = RoomDataStatusUIState.Loading
 
             try {
                 val call = roomRepository.updateRoomStatus(token, eventId, status.toString())
 
-                call.enqueue(object: Callback<GetRoomResponse>  {
+                call.enqueue(object: Callback<GeneralResponseModel>  {
                     override fun onResponse(
-                        call: Call<GetRoomResponse>,
-                        res: Response<GetRoomResponse>
+                        call: Call<GeneralResponseModel>,
+                        res: Response<GeneralResponseModel>
                     )  {
                         if (res.isSuccessful) {
-                            dataStatus = RoomDataStatusUIState.Success(res.body()!!.data)
+                            dataStatus = RoomDataStatusUIState.Updated(res.body()!!.data)
 
-                            /*navController.navigate(PagesEnum.YourEvents.name) {
-                                popUpTo(PagesEnum.CreateEvent.name) {
+                            navController.navigate(PagesEnum.HomeAdmin.name) {
+                                popUpTo(PagesEnum.RoomInfo.name) {
                                     inclusive = true
                                 }
-                            }*/ //TODO: GET THIS THING MANAGED AFTER ALL PAGESENUM ARE DONE FROM VIEW, GET IT TO COME BACK TO ADMIN'S HOME PAGE AFTER APPROVING/DISAPPROVING
+                            }
                         } else {
                             val errorMessage = Gson().fromJson(
                                 res.errorBody()!!.charStream(),
@@ -178,7 +185,7 @@ class RoomViewModel(
                         }
                     }
 
-                    override fun onFailure(call: Call<GetRoomResponse>, t: Throwable) {
+                    override fun onFailure(call: Call<GeneralResponseModel>, t: Throwable) {
                         dataStatus = RoomDataStatusUIState.Failed(t.localizedMessage)
                     }
 

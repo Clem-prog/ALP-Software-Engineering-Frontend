@@ -17,6 +17,9 @@ import com.example.alp_software_engineering_frontend.models.GetUserResponse
 import com.example.alp_software_engineering_frontend.repositories.UserRepository
 import com.example.alp_software_engineering_frontend.uiStates.UserDataStatusUIState
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -28,6 +31,24 @@ class UserViewModel(
 ) : ViewModel() {
     var dataStatus: UserDataStatusUIState by mutableStateOf(UserDataStatusUIState.Start)
         private set
+
+    val isAdmin: StateFlow<Boolean> = userRepository.currentIsAdmin.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false
+    )
+
+    val token: StateFlow<String> = userRepository.currentUserToken.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = ""
+    )
+
+    val id: StateFlow<Int> = userRepository.currentUserId.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = 0
+    )
 
     fun getAllUser(
         token: String
