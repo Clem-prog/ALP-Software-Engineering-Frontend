@@ -84,18 +84,15 @@ fun D4C(
         }
         
         composable(
-            route = "${PagesEnum.RoomInfo.name}/{roomId}/{status}",
+            route = "${PagesEnum.RoomInfo.name}/{roomId}",
             arguments = listOf(
-                navArgument("roomId") { type = NavType.IntType },
-                navArgument("status") { type = NavType.StringType }
+                navArgument("roomId") { type = NavType.IntType }
             )
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getInt("roomId")
-            val status = backStackEntry.arguments?.getString("status")
             RoomInfoView(
                 roomId = id!!,
                 token = token.value,
-                status = PaymentEnum.valueOf(status!!),
                 roomViewModel = roomViewModel,
                 paymentViewModel = paymentViewModel,
                 navController = navController

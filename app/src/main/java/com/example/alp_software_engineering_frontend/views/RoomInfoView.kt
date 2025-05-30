@@ -5,13 +5,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +38,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.alp_software_engineering_frontend.enums.PagesEnum
 import com.example.alp_software_engineering_frontend.enums.PaymentEnum
 import com.example.alp_software_engineering_frontend.models.UserModel
+import com.example.alp_software_engineering_frontend.uiStates.AuthenticationStatusUIState
 import com.example.alp_software_engineering_frontend.uiStates.PaymentDataStatusUIState
 import com.example.alp_software_engineering_frontend.uiStates.RoomDataStatusUIState
 import com.example.alp_software_engineering_frontend.viewModels.PaymentViewModel
@@ -44,10 +51,12 @@ fun RoomInfoView(
     token: String,
     roomViewModel: RoomViewModel,
     paymentViewModel: PaymentViewModel,
-    status: PaymentEnum,
     navController: NavController,
     receiptPainter: Painter? = null
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+    var successMessage by remember { mutableStateOf("") }
+
     LaunchedEffect(token) {
         roomViewModel.getRoomById(token, roomId)
         paymentViewModel.getLatestPayment(token, roomId)
@@ -56,10 +65,32 @@ fun RoomInfoView(
     val room = roomViewModel.dataStatus
     val payment = paymentViewModel.dataStatus
 
+    LaunchedEffect(room) {
+        if (room is RoomDataStatusUIState.Updated) {
+            successMessage = room.data
+            showDialog = true
+
+            roomViewModel.getRoomById(token, roomId)
+        }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("OK")
+                }
+            },
+            title = { Text("Success!") },
+            text = { Text(successMessage) }
+        )
+    }
+
     when (room) {
         is RoomDataStatusUIState.Success -> {
             val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-
+            var status = PaymentEnum.valueOf(room.roomModelData.paymentStatus)
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -265,7 +296,6 @@ fun RoomInfoViewPreview_Unpaid() {
         token = "TODO()",
         roomViewModel = viewModel(),
         paymentViewModel = viewModel(),
-        status = PaymentEnum.unpaid,
         navController = rememberNavController(),
     )
 }
