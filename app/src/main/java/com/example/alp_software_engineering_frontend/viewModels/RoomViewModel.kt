@@ -169,12 +169,6 @@ class RoomViewModel(
                     )  {
                         if (res.isSuccessful) {
                             dataStatus = RoomDataStatusUIState.Updated(res.body()!!.data)
-
-                            navController.navigate(PagesEnum.HomeAdmin.name) {
-                                popUpTo(PagesEnum.RoomInfo.name) {
-                                    inclusive = true
-                                }
-                            }
                         } else {
                             val errorMessage = Gson().fromJson(
                                 res.errorBody()!!.charStream(),

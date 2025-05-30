@@ -84,7 +84,7 @@ fun AdminView(
                                     tenantName = tenantName,
                                     dueDate = daysLeft,
                                     status = PaymentEnum.valueOf(room.paymentStatus),
-                                    onClickCard = { navController.navigate("${PagesEnum.RoomInfo.name}/${room.id}/${room.paymentStatus}")}
+                                    onClickCard = { navController.navigate("${PagesEnum.RoomInfo.name}/${room.id}")}
                                 )
                             }
                         }
